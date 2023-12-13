@@ -1,0 +1,84 @@
+1 selezionare tutti i corsi del corso di laurea in informatica(22)
+SELECT `degrees`.`name` AS `nome_corso_laurea`, `courses`.* FROM `courses`
+JOIN `degrees`
+ON `degrees`.`id` = `courses`.`degree_id`
+WHERE `degrees`.`name` = 'Corso di Laurea in Informatica';
+
+traduco
+
+ciò che puo conforndere è che in select io devo gia mettere i nomi dei campi che prenderò (degrees name come corso di laurea 
+e tutti gli elementi di courses) piazza sempre il nome tabella e poi nome campo che prendi 
+seleziona tutti gli elementi di courses che hanno una corrispondenza secondo il criterio dreegree id (pk) = corsi degree (fk)
+filtro (where) secondo i corsi di laurea in informatica!
+
+2. Selezionare le informazioni sul corso con id = 144, con tutti i relativi appelli d’esame
+SELECT `courses`.`name`, `courses`.`cfu`, `exams`.*
+FROM `courses`
+JOIN `exams`
+ON `exams`.`course_id`= `courses`.`id`
+WHERE `courses`.`id` = 144;
+
+3. Selezionare a quale dipartimento appartiene il Corso di Laurea in Diritto
+dell'Economia (Dipartimento di Scienze politiche, giuridiche e studi internazionali)
+SELECT `departments`.`name`
+FROM `degrees`
+JOIN `departments`
+ON `departments`.`id`= `degrees`.`department_id`
+WHERE `departments`.`name` = "Corso di Laurea in Diritto dell'Economia"
+
+
+4. Selezionare tutti gli appelli d'esame del Corso di Laurea Magistrale in Fisica del
+primo anno
+
+SELECT `degrees`.`name`, `exams`.*  
+FROM `exams`
+JOIN `courses`
+ON `exams`.`course_id` = `courses`.`id`
+JOIN `degrees`
+ON `courses`.`degree_id` = `degrees`.`id`
+WHERE `degrees`.`name`= "Corso di Laurea Magistrale in Fisica" && `courses`.`year`;
+
+
+5. Selezionare tutti i docenti che insegnano nel Corso di Laurea in Lettere (21)
+
+SELECT DISTINCT `degrees`.`name`, `teachers`.`name`, `teachers`.`surname`, `teachers`.`email`
+FROM `teachers`
+JOIN `course_teacher` ON `course_teacher`.`teacher_id` = `teachers`.`id`
+JOIN `courses` ON `course_teacher`.`course_id` = `courses`.`id`
+JOIN `degrees` ON `degrees`.`id` = `courses`.`degree_id`
+WHERE `degrees`.`name` = 'Corso di Laurea in Lettere';
+
+6. Selezionare il libretto universitario di Mirco Messina (matricola n. 620320)
+
+SELECT `students`.`name`, `students`.`surname`, `students`.`registration_number`, `courses`.`name`, `exams`.`date`, `exam_student`.`vote`
+FROM `exam_student`
+JOIN `students` ON `exam_student`.`student_id` = `students`.`id`
+JOIN `exams` ON `exam_student`.`exam_id` = `exams`.`id`
+JOIN `courses` ON `exams`.`course_id` = `courses`.`id`
+WHERE `students`.`registration_number` = 620320 && `exam_student`.`vote` >= 18;
+
+7. Selezionare il voto medio di superamento d'esame per ogni corso, con anche i dati
+del corso di laurea associato, ordinati per media voto decrescente
+
+SELECT `degrees`.`name` AS `corso`, `courses`.`name` AS `materia`, AVG(`exam_student`.`vote`) AS `voto_medio`
+FROM `exam_student` 
+JOIN `exams` ON `exams`.`id` = `exam_student`.`exam_id`
+JOIN `courses` ON `courses`.`id` = `exams`.`course_id`
+JOIN `degrees` ON `degrees`.`id` = `courses`.`degree_id`
+WHERE `exam_student`.`vote` >= 18
+GROUP BY `courses`.`id`
+ORDER BY `voto_medio`
+DESC
+
+
+
+esempio in classe
+SELECT `departments`.`name` COUNT(`degrees`.`id`) AS `numero_corsi` 
+FROM `degrees` 
+JOIN `departments` 
+ON `departments`.`id` = `degrees`.`department_id`
+GROUP BY `departments`.`id`
+HAVING `numero_corsi` > 5
+ORDER BY `numero_corsi` 
+DESC
+
